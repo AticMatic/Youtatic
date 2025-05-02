@@ -404,16 +404,16 @@
                                     </svg>
                                     Copy URL
                                 </button>
-                                <a:href="videoDetails?.url" target="_blank" rel="noopener noreferrer"
+                                <a :href="videoDetails?.url" target="_blank" rel="noopener noreferrer"
                                     class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
-                                    title="Open original">
+                                    title="Open original" :download="videoDetails?.title + '.' + format.ext">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                     </svg>
                                     Open original
-                                    </a:href=>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -585,7 +585,7 @@
 
                                     <!-- Download Button -->
                                     <div class="flex justify-end">
-                                        <a:href="format.url" target="_blank"
+                                        <a :href="format.url" target="_blank"
                                             :download="videoDetails?.title + '.' + format.ext"
                                             class="download-button bg-blue-100 text-blue-700 hover:bg-blue-200">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
@@ -594,7 +594,7 @@
                                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
                                             Download
-                                            </a>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -673,7 +673,7 @@
                 </a> for details on obtaining and using a free API key.
             </p>
             <!-- Example of how to show a simple registration form inline (optional) -->
-        
+
             <form id="apiRegisterForm" class="mt-3 max-w-sm mx-auto space-y-2">
                 <input type="email" name="email" placeholder="Your Email" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm">
@@ -705,7 +705,7 @@
                     }
                 });
             </script>
-        
+
             </p>
         </div>
 
@@ -714,7 +714,7 @@
             <p>© 2025 Media Downloader • For educational purposes only - Designed by <a
                     href="https://aticmatic.com/?utm__source=Youmatic" target="_blank">Aticmatic</a></p>
             <p class="mt-1">This tool is intended for downloading content that you have the right to access.</p>
-            </footer>
+        </footer>
     </div>
 </body>
 
