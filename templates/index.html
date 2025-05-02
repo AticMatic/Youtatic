@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Downloader - Enter URL</title>
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⬇️</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Apply the Inter font globally */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            /* Smoother fonts on WebKit */
+            -moz-osx-font-smoothing: grayscale;
+            /* Smoother fonts on Firefox */
+        }
+
+        /* Add a subtle transition for button hover */
+        button[type="submit"] {
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+
+        button[type="submit"]:hover {
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+            /* Blue shadow on hover */
+            transform: translateY(-1px);
+            /* Slight lift */
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0px);
+            /* Press down */
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Style for flash messages with fade-in/out */
+        .flash-message {
+            opacity: 1;
+            transition: opacity 0.5s ease-out, transform 0.3s ease-out;
+            transform: translateY(0);
+        }
+
+        .flash-message.fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        /* Custom focus ring */
+        input[type="url"]:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+            /* Tailwind's blue-500 focus ring */
+        }
+    </style>
+
+    <script>
+        // Optional: Configure Tailwind further if needed
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // You can add custom colors, fonts, etc. here
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+
+<body
+    class="bg-gradient-to-br from-gray-100 via-blue-50 to-gray-100 flex items-center justify-center min-h-screen p-4 antialiased">
+
+    <div
+        class="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg transform transition-all duration-500 hover:shadow-2xl border border-gray-200">
+
+        <div class="text-center mb-8">
+            <span class="text-4xl mb-2 inline-block">⬇️</span>
+            <h1 class="text-3xl font-bold text-gray-800">Media Downloader</h1>
+            <p class="text-gray-500 mt-1">Enter a video or media URL to see download options.</p>
+        </div>
+
+
+        <div id="flash-container" class="mb-5 space-y-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-message p-4 rounded-lg text-sm font-medium flex items-start shadow-md border
+                              {% if category == 'error' %} bg-red-50 border-red-200 text-red-800
+                              {% elif category == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-800
+                              {% else %} bg-blue-50 border-blue-200 text-blue-800 {% endif %}" role="alert">
+                <span class="flex-shrink-0 w-5 h-5 mr-3 mt-0.5">
+                    {% if category == 'error' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% elif category == 'warning' %}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {% endif %}
+                </span>
+                <span class="flex-grow">{{ message }}</span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <form action="{{ url_for('get_formats') }}" method="POST" class="space-y-6">
+            <div>
+                <label for="media_url" class="block text-sm font-medium text-gray-700 mb-1.5">Media URL</label>
+                <input type="url" id="media_url" name="media_url" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200 shadow-sm placeholder-gray-400"
+                    placeholder="Paste video or media link here...">
+            </div>
+            <button type="submit"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                    <path fill-rule="evenodd"
+                        d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span>Fetch Download Options</span>
+            </button>
+        </form>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashContainer = document.getElementById('flash-container');
+            if (flashContainer) {
+                const flashMessages = flashContainer.querySelectorAll('.flash-message');
+                flashMessages.forEach(msg => {
+                    // Set timeout to add fade-out class
+                    setTimeout(() => {
+                        msg.classList.add('fade-out');
+                        // Optional: Remove the element completely after fade out transition
+                        msg.addEventListener('transitionend', () => {
+                            // Check opacity to ensure it's the fade-out transition ending
+                            if (msg.style.opacity === '0' || msg.classList.contains('fade-out')) {
+                                msg.remove();
+                            }
+                        }, { once: true }); // Ensure listener runs only once
+                    }, 6000); // Start fade-out after 6 seconds
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
