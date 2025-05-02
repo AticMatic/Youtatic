@@ -1,0 +1,8 @@
+yt-dlp
+certifi
+flask
+humanize
+Flask-SQLAlchemy
+PyMySQL
+email_validator
+Flask-Limiter
