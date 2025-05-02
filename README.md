@@ -43,7 +43,7 @@ Flask-Limiter
 1. **Clone this repository**
 
    ```bash
-   git clone https://github.com/AticMatic/media-downloader.git
+   git clone https://github.com/AticMatic/Youtatic.git
    cd media-downloader
    ```
 
