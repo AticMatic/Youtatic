@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Downloader</title>
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📥</text></svg>">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f9fafb;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #1e3a8a;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 1.5rem;
+            height: 1.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+
+        .format-card {
+            transition: all 0.2s ease;
+        }
+
+        .format-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .download-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .download-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .download-button:active {
+            transform: translateY(0);
+        }
+
+        .bg-blur {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        /* Custom scrollbar */
+        .formats-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .formats-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .formats-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .formats-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .video-title-container {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-4 md:p-8 lg:p-10">
+    <div x-data="{
+        isLoading: false,
+        error: null,
+        results: null,
+        videoDetails: null,
+        activeTab: 'all',
+        showInfo: false,
+        videoThumbnail: null,
+        recommendations: [
+            'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'https://www.youtube.com/watch?v=9bZkp7q19f0',
+            'https://www.youtube.com/watch?v=kJQP7kiw5Fk'
+        ],
+        
+        setActiveTab(tab) {
+            this.activeTab = tab;
+        },
+        
+        toggleInfo() {
+            this.showInfo = !this.showInfo;
+        },
+        
+        getFilteredFormats() {
+            if (!this.results) return [];
+            
+            const formats = this.results.data.formats;
+            if (this.activeTab === 'all') return formats;
+            
+            if (this.activeTab === 'video+audio') {
+                return formats.filter(f => f.type === 'Video+Audio');
+            } else if (this.activeTab === 'video') {
+                return formats.filter(f => f.type === 'Video Only');
+            } else if (this.activeTab === 'audio') {
+                return formats.filter(f => f.type === 'Audio Only');
+            }
+            
+            return formats;
+        },
+        
+        getFormatTypeCount(type) {
+            if (!this.results) return 0;
+            return this.results.data.formats.filter(f => {
+                if (type === 'video+audio') return f.type === 'Video+Audio';
+                if (type === 'video') return f.type === 'Video Only';
+                if (type === 'audio') return f.type === 'Audio Only';
+                return true;
+            }).length;
+        },
+        
+        formatFileSize(size) {
+            if (!size) return 'Unknown size';
+            
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let fileSize = size;
+            let unitIndex = 0;
+            
+            while (fileSize >= 1024 && unitIndex < units.length-1) {
+                fileSize /= 1024;
+                unitIndex++;
+            }
+            
+            return `${fileSize.toFixed(1)} ${units[unitIndex]}`;
+        },
+        
+        copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Could add a toast notification here
+                console.log('Copied to clipboard');
+            });
+        },
+        
+        getQualityClass(format) {
+            if (format.type === 'Video+Audio' || format.type === 'Video Only') {
+                const height = format.height || 0;
+                if (height >= 1080) return 'bg-green-100 text-green-800';
+                if (height >= 720) return 'bg-blue-100 text-blue-800';
+                if (height >= 480) return 'bg-yellow-100 text-yellow-800';
+                return 'bg-gray-100 text-gray-800';
+            }
+            
+            if (format.type === 'Audio Only') {
+                const abr = format.abr || 0;
+                if (abr >= 256) return 'bg-purple-100 text-purple-800';
+                if (abr >= 128) return 'bg-indigo-100 text-indigo-800';
+                return 'bg-gray-100 text-gray-800';
+            }
+            
+            return 'bg-gray-100 text-gray-800';
+        },
+        
+        fetchVideoDetails(url) {
+            this.isLoading = true;
+            this.error = null;
+            this.results = null;
+            this.videoDetails = null;
+            this.videoThumbnail = null;
+            
+            const form = new FormData();
+            form.append('media_url', url);
+            
+            fetch('/get_formats', {
+                method: 'POST',
+                body: form
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.results = data;
+                        
+                        // Extract video details
+                        if (data.data && data.data.title) {
+                            this.videoDetails = {
+                                title: data.data.title,
+                                url: data.data.original_url
+                            };
+                            
+                            // Set default active tab based on available formats
+                            if (this.getFormatTypeCount('video+audio') > 0) {
+                                this.activeTab = 'video+audio';
+                            } else if (this.getFormatTypeCount('video') > 0) {
+                                this.activeTab = 'video';
+                            } else if (this.getFormatTypeCount('audio') > 0) {
+                                this.activeTab = 'audio';
+                            } else {
+                                this.activeTab = 'all';
+                            }
+                            
+                            // YouTube thumbnail extraction (simple method)
+                            if (data.data.original_url.includes('youtube.com') || data.data.original_url.includes('youtu.be')) {
+                                const videoId = data.data.original_url.includes('v=') 
+                                    ? data.data.original_url.split('v=')[1].split('&')[0]
+                                    : data.data.original_url.split('/').pop().split('?')[0];
+                                    
+                                if (videoId) {
+                                    this.videoThumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                                }
+                            }
+                        }
+                    } else {
+                        this.error = data.error || 'Failed to fetch video details';
+                    }
+                })
+                .catch(err => {
+                    this.error = err.message || 'An unexpected error occurred';
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+        }
+    }" class="max-w-6xl mx-auto">
+
+        <!-- Header Section -->
+        <header class="mb-8 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="text-5xl">📥</div>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">Media Downloader</h1>
+            <p class="text-gray-600 max-w-3xl mx-auto">Extract and download audio and video from YouTube and other
+                supported platforms</p>
+        </header>
+
+        <!-- URL Input Form -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8 max-w-3xl mx-auto">
+            <form @submit.prevent="fetchVideoDetails(document.getElementById('media_url').value)" class="space-y-4">
+                <div>
+                    <label for="media_url" class="block text-sm font-medium text-gray-700 mb-1">Media URL</label>
+                    <div class="relative">
+                        <input type="url" id="media_url" name="media_url"
+                            class="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Paste YouTube or media URL..." :disabled="isLoading" required>
+                        <div
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    :disabled="isLoading">
+                    <div x-show="isLoading" class="spinner"></div>
+                    <svg x-show="!isLoading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                    <span x-text="isLoading ? 'Processing...' : 'Find Download Options'"></span>
+                </button>
+            </form>
+
+            <!-- Quick Links -->
+            <div x-show="!isLoading && !results" class="mt-5 pt-5 border-t border-gray-200">
+                <p class="text-sm text-gray-600 mb-2">Try these examples:</p>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="(url, index) in recommendations" :key="index">
+                        <button @click="document.getElementById('media_url').value = url; fetchVideoDetails(url)"
+                            class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-2 rounded transition">
+                            Example <span x-text="index + 1"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div x-show="error" class="max-w-3xl mx-auto mb-8 fade-enter fade-enter-active">
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Error</h3>
+                        <p class="text-sm text-red-700 mt-1" x-text="error"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div x-show="results && !error" class="max-w-5xl mx-auto fade-enter fade-enter-active">
+
+            <!-- Video/Media Details Card -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Thumbnail (if available) -->
+                    <div x-show="videoThumbnail"
+                        class="w-full md:w-64 h-40 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                        <img:src="videoThumbnail" class="w-full h-full object-cover" alt="Thumbnail">
+                    </div>
+
+                    <!-- Video Information -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-col h-full justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800 mb-2 video-title-container"
+                                    x-text="videoDetails?.title"></h2>
+                                <div class="text-sm text-gray-500 mb-2 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="truncate" x-text="videoDetails?.url"></span>
+                                </div>
+
+                                <!-- Format stats -->
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <div class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                                        <span x-text="getFormatTypeCount('all')"></span> Total Formats
+                                    </div>
+                                    <div x-show="getFormatTypeCount('video+audio') > 0"
+                                        class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                        <span x-text="getFormatTypeCount('video+audio')"></span> Video+Audio
+                                    </div>
+                                    <div x-show="getFormatTypeCount('video') > 0"
+                                        class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                                        <span x-text="getFormatTypeCount('video')"></span> Video Only
+                                    </div>
+                                    <div x-show="getFormatTypeCount('audio') > 0"
+                                        class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                                        <span x-text="getFormatTypeCount('audio')"></span> Audio Only
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex items-center gap-3">
+                                <button @click="copyToClipboard(videoDetails?.url)"
+                                    class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                                    title="Copy URL">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    Copy URL
+                                </button>
+                                <a:href="videoDetails?.url" target="_blank" rel="noopener noreferrer"
+                                    class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                                    title="Open original">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                    Open original
+                                    </a:href=>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Format Tabs and Results -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <!-- Format Type Tabs -->
+                <div class="border-b border-gray-200 overflow-x-auto whitespace-nowrap">
+                    <div class="flex">
+                        <button @click="setActiveTab('all')"
+                            class="py-3 px-4 inline-flex items-center gap-1 text-sm font-medium transition-colors"
+                            :class="activeTab === 'all' ? 'tab-active' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                            All Formats
+                            <span class="ml-1 bg-gray-100 text-gray-700 rounded-full px-2 py-0.5 text-xs"
+                                x-text="getFormatTypeCount('all')"></span>
+                        </button>
+
+                        <button x-show="getFormatTypeCount('video+audio') > 0" @click="setActiveTab('video+audio')"
+                            class="py-3 px-4 inline-flex items-center gap-1 text-sm font-medium transition-colors"
+                            :class="activeTab === 'video+audio' ? 'tab-active' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            Video + Audio
+                            <span class="ml-1 bg-green-100 text-green-800 rounded-full px-2 py-0.5 text-xs"
+                                x-text="getFormatTypeCount('video+audio')"></span>
+                        </button>
+
+                        <button x-show="getFormatTypeCount('video') > 0" @click="setActiveTab('video')"
+                            class="py-3 px-4 inline-flex items-center gap-1 text-sm font-medium transition-colors"
+                            :class="activeTab === 'video' ? 'tab-active' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                            </svg>
+                            Video Only
+                            <span class="ml-1 bg-yellow-100 text-yellow-800 rounded-full px-2 py-0.5 text-xs"
+                                x-text="getFormatTypeCount('video')"></span>
+                        </button>
+
+                        <button x-show="getFormatTypeCount('audio') > 0" @click="setActiveTab('audio')"
+                            class="py-3 px-4 inline-flex items-center gap-1 text-sm font-medium transition-colors"
+                            :class="activeTab === 'audio' ? 'tab-active' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                            </svg>
+                            Audio Only
+                            <span class="ml-1 bg-purple-100 text-purple-800 rounded-full px-2 py-0.5 text-xs"
+                                x-text="getFormatTypeCount('audio')"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Container -->
+                <div class="p-6 max-h-[60vh] overflow-y-auto formats-container">
+                    <template x-if="getFilteredFormats().length === 0">
+                        <div class="text-center py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 class="text-lg font-medium text-gray-700 mb-1">No formats found</h3>
+                            <p class="text-gray-500 text-sm">Try another tab or search for a different video</p>
+                        </div>
+                    </template>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <template x-for="(format, index) in getFilteredFormats()" :key="index">
+                            <div
+                                class="format-card bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:border-gray-300">
+                                <div class="p-4">
+                                    <!-- Format Header -->
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <!-- Format Type Icon -->
+                                                <div x-show="format.type === 'Video+Audio'" class="text-green-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                                <div x-show="format.type === 'Video Only'" class="text-yellow-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                                                    </svg>
+                                                </div>
+                                                <div x-show="format.type === 'Audio Only'" class="text-purple-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                                    </svg>
+                                                </div>
+
+                                                <!-- Format Type Badge -->
+                                                <span class="px-2 py-0.5 rounded-full text-xs font-medium"
+                                                    :class="getQualityClass(format)" x-text="format.type"></span>
+                                            </div>
+
+                                            <!-- Format Name/ID -->
+                                            <h3 class="text-sm font-medium text-gray-900 truncate"
+                                                x-text="format.format_name || format.format_id"></h3>
+                                        </div>
+
+                                        <!-- Format Size -->
+                                        <div x-show="format.filesize !== undefined"
+                                            class="text-xs py-1 px-2 bg-gray-100 rounded text-gray-700 font-medium"
+                                            x-text="formatFileSize(format.filesize)"></div>
+                                    </div>
+
+                                    <!-- Format Specs -->
+                                    <div class="text-xs text-gray-600 mb-4 grid grid-cols-2 gap-2">
+                                        <div x-show="format.width && format.height" class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+                                            </svg>
+                                            <span x-text="`${format.width}×${format.height}`"></span>
+                                        </div>
+
+                                        <div x-show="format.fps" class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span x-text="`${format.fps} FPS`"></span>
+                                        </div>
+
+                                        <div x-show="format.abr" class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414-9.9m2.828 9.9a9 9 0 001.414-12.728" />
+                                            </svg>
+                                            <span x-text="`${format.abr} kbps`"></span>
+                                        </div>
+
+                                        <div x-show="format.ext" class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <span x-text="format.ext.toUpperCase()"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Download Button -->
+                                    <div class="flex justify-end">
+                                        <a:href="format.url" target="_blank"
+                                            :download="videoDetails?.title + '.' + format.ext"
+                                            class="download-button bg-blue-100 text-blue-700 hover:bg-blue-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                            Download
+                                            </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!--Instructions & Help Card-->
+        <div class="mt-8 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div class="flex items-start justify-between">
+                <div class="flex gap-3">
+                    <div class="flex-shrink-0 text-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-gray-900 mb-1">Download Instructions</h3>
+                        <div class="text-sm text-gray-600">
+                            <p class="mb-2">Click the download button next to your preferred format to start
+                                your download. Some notes:</p>
+                            <ul class="list-disc pl-5 space-y-1 mb-2">
+                                <li><strong>Video+Audio</strong> formats are the easiest to use as they contain
+                                    both video and audio in a single file.</li>
+                                <li><strong>Video Only</strong> formats have no sound and are typically used for
+                                    editing.</li>
+                                <li><strong>Audio Only</strong> formats are perfect for music or podcasts.</li>
+                            </ul>
+                            <p>For the best quality, look for higher resolution (720p, 1080p) and higher bitrate
+                                formats.</p>
+                        </div>
+                    </div>
+                </div>
+                <button @click="toggleInfo()" class="text-gray-500 hover:text-gray-700">
+                    <svg x-show="!showInfo" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                    <svg x-show="showInfo" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+            </div>
+
+            <div x-show="showInfo" class="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-600">
+                <h4 class="font-medium text-gray-800 mb-2">Supported Sites</h4>
+                <p class="mb-3">This tool supports extracting media from YouTube, Vimeo, Twitter, Facebook,
+                    Instagram, SoundCloud, and hundreds of other sites.</p>
+
+                <h4 class="font-medium text-gray-800 mb-2">Technical Notes</h4>
+                <ul class="list-disc pl-5 space-y-1">
+                    <li>The download speed depends on your internet connection and the source server.</li>
+                    <li>Some formats may not be available for all videos.</li>
+                    <li>High-resolution downloads may take longer to process and download.</li>
+                    <li>This tool respects the terms of service of source websites and fair use policies.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!--Footer -->
+    <footer class="mt-12 text-center text-sm text-gray-500">
+        <p>© 2025 Media Downloader • For educational purposes only - Designed by <a href="https://aticmatic.com/?utm__source=Youmatic">Aticmatic</a></p>
+        <p class="mt-1">This tool is intended for downloading content that you have the right to access.</p>
+    </footer>
+    </div>
+</body>
+
+</html>

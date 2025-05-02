@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Downloader - Enter URL</title>
+    <title>Media Downloader</title>
 
     <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⬇️</text></svg>">
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -15,157 +15,277 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
-        /* Apply the Inter font globally */
+        /* Base styles */
         body {
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
-            /* Smoother fonts on WebKit */
             -moz-osx-font-smoothing: grayscale;
-            /* Smoother fonts on Firefox */
-        }
-
-        /* Add a subtle transition for button hover */
-        button[type="submit"] {
-            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.1s ease-in-out;
-        }
-
-        button[type="submit"]:hover {
-            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
-            /* Blue shadow on hover */
-            transform: translateY(-1px);
-            /* Slight lift */
-        }
-
-        button[type="submit"]:active {
-            transform: translateY(0px);
-            /* Press down */
-            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
-        }
-
-        /* Style for flash messages with fade-in/out */
-        .flash-message {
-            opacity: 1;
-            transition: opacity 0.5s ease-out, transform 0.3s ease-out;
-            transform: translateY(0);
-        }
-
-        .flash-message.fade-out {
-            opacity: 0;
-            transform: translateY(-10px);
         }
 
         /* Custom focus ring */
-        input[type="url"]:focus {
+        input[type="url"]:focus,
+        button:focus {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
             /* Tailwind's blue-500 focus ring */
+            outline: none;
         }
-    </style>
 
-    <script>
-        // Optional: Configure Tailwind further if needed
-        tailwind.config = {
-            theme: {
-                extend: {
-                    // You can add custom colors, fonts, etc. here
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                }
+        /* Loading Spinner Animation */
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            /* blue-500 */
+            border-radius: 50%;
+            width: 1.5rem;
+            /* w-6 */
+            height: 1.5rem;
+            /* h-6 */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
         }
-    </script>
+
+        /* Subtle transition for result display */
+        #results-container>* {
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
+
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Download button styles */
+        .download-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            /* gap-2 */
+            padding: 0.5rem 1rem;
+            /* py-2 px-4 */
+            background-color: #10b981;
+            /* emerald-500 */
+            color: white;
+            font-weight: 600;
+            /* font-semibold */
+            border-radius: 0.375rem;
+            /* rounded-md */
+            text-decoration: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+        }
+
+        .download-button:hover {
+            background-color: #059669;
+            /* emerald-600 */
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .download-button:active {
+            background-color: #047857;
+            /* emerald-700 */
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Tooltip styles (simple example) */
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-5px);
+            background-color: #374151;
+            /* gray-700 */
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            /* rounded */
+            font-size: 0.75rem;
+            /* text-xs */
+            white-space: nowrap;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            /* Allow clicks on the button */
+        }
+
+        [data-tooltip]:hover::after {
+            opacity: 1;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        /* Needed for tooltip positioning */
+    </style>
 </head>
 
 <body
-    class="bg-gradient-to-br from-gray-100 via-blue-50 to-gray-100 flex items-center justify-center min-h-screen p-4 antialiased">
+    class="bg-gradient-to-br from-gray-50 via-blue-50 to-gray-100 min-h-screen p-4 md:p-8 flex items-center justify-center antialiased"
+    x-data="{ isLoading: false, error: null, results: null }">
 
-    <div
-        class="bg-white p-8 rounded-xl shadow-xl w-full max-w-lg transform transition-all duration-500 hover:shadow-2xl border border-gray-200">
+    <div class="bg-white p-6 md:p-8 rounded-xl shadow-xl w-full max-w-3xl border border-gray-200">
 
-        <div class="text-center mb-8">
-            <span class="text-4xl mb-2 inline-block">⬇️</span>
-            <h1 class="text-3xl font-bold text-gray-800">Media Downloader</h1>
-            <p class="text-gray-500 mt-1">Enter a video or media URL to see download options.</p>
+        <div class="text-center mb-6 border-b border-gray-200 pb-4">
+            <span class="text-4xl mb-2 inline-block">🚀</span>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Media Downloader</h1>
+            <p class="text-gray-500 mt-1 text-sm md:text-base">Paste a media URL to fetch download options.</p>
         </div>
 
-
-        <div id="flash-container" class="mb-5 space-y-3">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="flash-message p-4 rounded-lg text-sm font-medium flex items-start shadow-md border
-                              {% if category == 'error' %} bg-red-50 border-red-200 text-red-800
-                              {% elif category == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-800
-                              {% else %} bg-blue-50 border-blue-200 text-blue-800 {% endif %}" role="alert">
-                <span class="flex-shrink-0 w-5 h-5 mr-3 mt-0.5">
-                    {% if category == 'error' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    {% elif category == 'warning' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    {% else %}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
-                        <path fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    {% endif %}
-                </span>
-                <span class="flex-grow">{{ message }}</span>
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-        </div>
-
-        <form action="{{ url_for('get_formats') }}" method="POST" class="space-y-6">
+        <form id="media-form" @submit.prevent="fetchFormats" class="space-y-4 mb-6">
             <div>
-                <label for="media_url" class="block text-sm font-medium text-gray-700 mb-1.5">Media URL</label>
-                <input type="url" id="media_url" name="media_url" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200 shadow-sm placeholder-gray-400"
-                    placeholder="Paste video or media link here...">
+                <label for="media_url" class="sr-only">Media URL</label> <input type="url" id="media_url" name="media_url" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition duration-200 shadow-sm placeholder-gray-400 text-base"
+                    placeholder="Paste video or media link here..." :disabled="isLoading">
             </div>
             <button type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg flex items-center justify-center gap-2 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                :disabled="isLoading">
+                <div x-show="isLoading" class="spinner"></div>
+                <svg x-show="!isLoading" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                    class="w-5 h-5">
                     <path fill-rule="evenodd"
                         d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
                         clip-rule="evenodd" />
                 </svg>
-                <span>Fetch Download Options</span>
+                <span x-text="isLoading ? 'Fetching...' : 'Fetch Download Options'"></span>
             </button>
         </form>
 
-    </div>
+        <div id="results-container" class="mt-6 min-h-[100px]"> <template x-if="error">
+                <div
+                    class="border border-red-300 bg-red-50 p-4 rounded-lg text-center text-red-700 shadow-sm fade-enter fade-enter-active">
+                    <p class="font-medium">Error</p>
+                    <p class="text-sm mt-1" x-text="error"></p>
+                </div>
+            </template>
+        
+            <template x-if="results && !error">
+                <div class="border border-gray-200 rounded-lg p-4 md:p-6 bg-white shadow-sm fade-enter fade-enter-active">
+                    <div class="mb-4 pb-3 border-b border-gray-200">
+                        <h2 class="text-lg md:text-xl font-semibold text-gray-800 break-words mb-1" x-text="results.data.title">
+                        </h2>
+                        <p class="text-xs text-gray-500 break-all">
+                            Source: <span x-text="results.data.original_url"></span>
+                        </p>
+                    </div>
+        
+                    <h3 class="text-base font-medium text-gray-700 mb-3">Available Formats:</h3>
+                    <ul class="space-y-3">
+                        <template x-for="(format, index) in results.data.formats" :key="index">
+                            <li class="border border-gray-200 p-3 rounded-md hover:bg-gray-50 transition duration-150">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                    <div class="flex-grow min-w-0">
+                                        <div class="flex items-center gap-x-2 gap-y-1 mb-1 flex-wrap">
+                                            <span class="font-medium text-gray-700 text-sm whitespace-nowrap"
+                                                x-text="format.resolution || format.ext.toUpperCase()"></span>
+                                            <span class="text-xs text-gray-500" x-text="'(' + format.ext + ')'"></span>
+                                            <span
+                                                class="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded whitespace-nowrap"
+                                                x-text="'~' + format.filesize_display"></span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 flex items-center gap-x-2 gap-y-1 flex-wrap">
+                                            <span class="inline-flex items-center gap-1 whitespace-nowrap"
+                                                x-text="format.type + (format.type === 'Audio Only' && format.abr ? ' (' + Math.round(format.abr) + 'kbps)' : '')"></span>
+                                            <span class="text-gray-400"
+                                                x-text="'ID: ' + format.id + (format.note && format.note !== format.resolution ? ' - ' + format.note : '')"></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 self-start sm:self-center relative">
+                                        <a :href="format.url"
+                                            :download="`${results.data.title.replace(/[^a-zA-Z0-9_]/g, '_')}_${format.id}.${format.ext}`"
+                                            target="_blank" rel="noopener noreferrer" class="download-button"
+                                            :data-tooltip="`Download ${format.resolution || format.ext.toUpperCase()} (${format.ext})`"
+                                            title="Download format"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"
+                                                fill="currentColor" class="w-4 h-4">
+                                                <path
+                                                    d="M8.5 2.75a.75.75 0 0 0-1.5 0v5.69L5.03 6.47a.75.75 0 0 0-1.06 1.06l3.5 3.5a.75.75 0 0 0 1.06 0l3.5-3.5a.75.75 0 1 0-1.06-1.06L8.5 8.44V2.75Z" />
+                                                <path
+                                                    d="M3.5 9.75a.75.75 0 0 0-1.5 0v1.5A2.75 2.75 0 0 0 4.75 14h6.5A2.75 2.75 0 0 0 14 11.25v-1.5a.75.75 0 0 0-1.5 0v1.5c0 .69-.56 1.25-1.25 1.25h-6.5c-.69 0-1.25-.56-1.25-1.25v-1.5Z" />
+                                            </svg>
+                                            <span>Download</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+                    <template x-if="results && results.data.formats.length === 0">
+                        <p class="text-center text-gray-500 mt-4 text-sm">No downloadable formats found for this media.
+                        </p>
+                    </template>
+                </div>
+            </template>
 
+        </div>
+        </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const flashContainer = document.getElementById('flash-container');
-            if (flashContainer) {
-                const flashMessages = flashContainer.querySelectorAll('.flash-message');
-                flashMessages.forEach(msg => {
-                    // Set timeout to add fade-out class
-                    setTimeout(() => {
-                        msg.classList.add('fade-out');
-                        // Optional: Remove the element completely after fade out transition
-                        msg.addEventListener('transitionend', () => {
-                            // Check opacity to ensure it's the fade-out transition ending
-                            if (msg.style.opacity === '0' || msg.classList.contains('fade-out')) {
-                                msg.remove();
+                        function fetchFormats() {
+                            // Get the Alpine.js data context
+                            const alpineData = this; // 'this' refers to the x-data scope here
+                            const form = document.getElementById('media-form');
+                            const formData = new FormData(form);
+                            // *** CRITICAL LINE: Ensure this matches the function name in app.py ***
+                            const url = "{{ url_for('get_formats') }}"; // Get URL from Flask
+
+                            // Reset state
+                            alpineData.isLoading = true;
+                            alpineData.error = null;
+                            alpineData.results = null;
+
+                            fetch(url, {
+                                method: 'POST',
+                                body: formData,
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        // Try to parse error JSON from server, otherwise use status text
+                                        return response.json().then(errData => {
+                                            // Use the 'error' field from the JSON if available
+                                            throw new Error(errData.error || `Server error: ${response.statusText}`);
+                                        }).catch(() => {
+                                            // Fallback if response isn't valid JSON or parsing fails
+                                            throw new Error(`Server error: ${response.status} ${response.statusText}`);
+                                        });
+                                    }
+                                    return response.json(); // Parse successful JSON response
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        alpineData.results = data; // Store successful results
+                                        // You could add client-side sorting here if desired, e.g.:
+                                        // alpineData.results.data.formats.sort((a, b) => (b.height || 0) - (a.height || 0));
+                                    } else {
+                                        // Use the error message provided in the JSON response
+                                        alpineData.error = data.error || 'An unknown error occurred processing the request.';
                             }
-                        }, { once: true }); // Ensure listener runs only once
-                    }, 6000); // Start fade-out after 6 seconds
+                            })
+                            .catch(error => {
+                                console.error('Fetch Error:', error);
+                                // Display the caught error message (could be from network or server)
+                                alpineData.error = error.message || 'Failed to fetch data. Check network or URL.';
+                            })
+                            .finally(() => {
+                                alpineData.isLoading = false; // Stop loading indicator regardless of outcome
                 });
-            }
-        });
+                    }
     </script>
 
 </body>
