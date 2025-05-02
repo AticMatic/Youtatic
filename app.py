@@ -1,4 +1,15 @@
 import os
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
+
+
+# def application(environ, start_response): 
+#     start_response('200 OK', [('Content-Type', 'text/plain')])
+#     message = 'It works!\n'
+#     version = 'Python %s\n' % sys.version.split()[0]
+#     response = '\n'.join([message, version])
+#     return [response.encode()]
+
 import yt_dlp
 from flask import Flask, request, render_template, jsonify
 import humanize
@@ -30,7 +41,7 @@ limiter = Limiter(
 # --- Database Configuration ---
 # Replace with your actual MySQL connection details
 # Format: mysql+pymysql://username:password@host/database_name
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:root@localhost/media_downloader_db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://aticmatic_youtatic_db:k6kRgoSSRAKA@localhost/aticmatic_youtatic_db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 

@@ -1,0 +1,121 @@
+2025-05-02 08:49:58,203 INFO: Humanize library found. [in app.py:66]
+2025-05-02 08:49:58,563 INFO: Database tables checked/created. [in app.py:370]
+Traceback (most recent call last):
+  File "/home/aticmatic/you.aticmatic.com/passenger_wsgi.py", line 17, in <module>
+    application = wsgi.application
+                  ^^^^^^^^^^^^^^^^
+AttributeError: module 'wsgi' has no attribute 'application'
+2025-05-02 08:49:58,609 INFO: Humanize library found. [in app.py:66]
+2025-05-02 08:49:58,927 INFO: Database tables checked/created. [in app.py:370]
+Traceback (most recent call last):
+  File "/home/aticmatic/you.aticmatic.com/passenger_wsgi.py", line 17, in <module>
+    application = wsgi.application
+                  ^^^^^^^^^^^^^^^^
+AttributeError: module 'wsgi' has no attribute 'application'
+2025-05-02 08:52:44,768 INFO: Humanize library found. [in app.py:66]
+2025-05-02 08:52:44,908 INFO: Database tables checked/created. [in app.py:370]
+Traceback (most recent call last):
+  File "/home/aticmatic/you.aticmatic.com/passenger_wsgi.py", line 17, in <module>
+    application = wsgi.application
+                  ^^^^^^^^^^^^^^^^
+AttributeError: module 'wsgi' has no attribute 'application'
+2025-05-02 08:52:47,733 INFO: Humanize library found. [in app.py:66]
+2025-05-02 08:52:47,761 INFO: Database tables checked/created. [in app.py:370]
+Traceback (most recent call last):
+  File "/home/aticmatic/you.aticmatic.com/passenger_wsgi.py", line 17, in <module>
+    application = wsgi.application
+                  ^^^^^^^^^^^^^^^^
+AttributeError: module 'wsgi' has no attribute 'application'
+2025-05-02 08:52:48,535 INFO: Humanize library found. [in app.py:66]
+2025-05-02 08:52:49,152 INFO: Database tables checked/created. [in app.py:370]
+Traceback (most recent call last):
+  File "/home/aticmatic/you.aticmatic.com/passenger_wsgi.py", line 17, in <module>
+    application = wsgi.application
+                  ^^^^^^^^^^^^^^^^
+AttributeError: module 'wsgi' has no attribute 'application'
+2025-05-02 08:52:50,858 INFO: Humanize library found. [in app.py:66]
+2025-05-02 08:52:51,116 INFO: Database tables checked/created. [in app.py:370]
+Traceback (most recent call last):
+  File "/home/aticmatic/you.aticmatic.com/passenger_wsgi.py", line 17, in <module>
+    application = wsgi.application
+                  ^^^^^^^^^^^^^^^^
+AttributeError: module 'wsgi' has no attribute 'application'
+2025-05-02 08:55:26,626 INFO: Humanize library found. [in /home/aticmatic/you.aticmatic.com/app.py:66]
+2025-05-02 08:55:27,610 INFO: Database tables checked/created. [in /home/aticmatic/you.aticmatic.com/app.py:370]
+2025-05-02 08:55:27,630 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 08:55:40,533 INFO: Processing request for URL: https://www.youtube.com/watch?v=K87aFjB7Ff0&ab_channel=NatureStories [in /home/aticmatic/you.aticmatic.com/app.py:232]
+2025-05-02 08:55:40,533 INFO: Calling yt-dlp extract_info for: https://www.youtube.com/watch?v=K87aFjB7Ff0&ab_channel=NatureStories [in /home/aticmatic/you.aticmatic.com/app.py:94]
+2025-05-02 08:55:40,857 WARNING: Assuming --restrict-filenames since file system encoding cannot encode all characters. Set the LC_ALL environment variable to fix this. [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:1091]
+2025-05-02 08:55:44,014 ERROR: ERROR: [youtube] K87aFjB7Ff0: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:967]
+2025-05-02 08:55:44,015 ERROR: yt-dlp DownloadError for URL https://www.youtube.com/watch?v=K87aFjB7Ff0&ab_channel=NatureStories: ERROR: [youtube] K87aFjB7Ff0: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/you.aticmatic.com/app.py:244]
+2025-05-02 08:55:52,610 INFO: Processing request for URL: https://www.youtube.com/watch?v=K87aFjB7Ff0 [in /home/aticmatic/you.aticmatic.com/app.py:232]
+2025-05-02 08:55:52,611 INFO: Calling yt-dlp extract_info for: https://www.youtube.com/watch?v=K87aFjB7Ff0 [in /home/aticmatic/you.aticmatic.com/app.py:94]
+2025-05-02 08:55:54,600 ERROR: ERROR: [youtube] K87aFjB7Ff0: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:967]
+2025-05-02 08:55:54,601 ERROR: yt-dlp DownloadError for URL https://www.youtube.com/watch?v=K87aFjB7Ff0: ERROR: [youtube] K87aFjB7Ff0: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/you.aticmatic.com/app.py:244]
+2025-05-02 08:55:57,410 INFO: Processing request for URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ [in /home/aticmatic/you.aticmatic.com/app.py:232]
+2025-05-02 08:55:57,410 INFO: Calling yt-dlp extract_info for: https://www.youtube.com/watch?v=dQw4w9WgXcQ [in /home/aticmatic/you.aticmatic.com/app.py:94]
+2025-05-02 08:55:59,332 ERROR: ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:967]
+2025-05-02 08:55:59,332 ERROR: yt-dlp DownloadError for URL https://www.youtube.com/watch?v=dQw4w9WgXcQ: ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/you.aticmatic.com/app.py:244]
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
+2025-05-02 09:06:27,589 INFO: Humanize library found. [in /home/aticmatic/you.aticmatic.com/app.py:66]
+2025-05-02 09:06:27,890 INFO: Database tables checked/created. [in /home/aticmatic/you.aticmatic.com/app.py:370]
+2025-05-02 09:06:27,924 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:06:30,189 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:06:46,655 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:06:47,873 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
+2025-05-02 09:22:17,989 INFO: Humanize library found. [in /home/aticmatic/you.aticmatic.com/app.py:66]
+2025-05-02 09:22:18,089 INFO: Database tables checked/created. [in /home/aticmatic/you.aticmatic.com/app.py:370]
+2025-05-02 09:22:18,104 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:24,454 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:32,350 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:32,849 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:33,896 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:34,478 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:35,456 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:38,568 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:39,533 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:22:40,141 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
+2025-05-02 09:35:51,614 INFO: Humanize library found. [in /home/aticmatic/you.aticmatic.com/app.py:66]
+2025-05-02 09:35:51,821 INFO: Database tables checked/created. [in /home/aticmatic/you.aticmatic.com/app.py:370]
+2025-05-02 09:35:51,840 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+2025-05-02 09:42:12,628 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 09:42:15,504 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
+2025-05-02 10:01:57,179 INFO: Humanize library found. [in /home/aticmatic/you.aticmatic.com/app.py:66]
+2025-05-02 10:01:57,411 INFO: Database tables checked/created. [in /home/aticmatic/you.aticmatic.com/app.py:370]
+2025-05-02 10:01:57,442 INFO: Processing request for URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ [in /home/aticmatic/you.aticmatic.com/app.py:232]
+2025-05-02 10:01:57,443 INFO: Calling yt-dlp extract_info for: https://www.youtube.com/watch?v=dQw4w9WgXcQ [in /home/aticmatic/you.aticmatic.com/app.py:94]
+2025-05-02 10:01:57,909 WARNING: Assuming --restrict-filenames since file system encoding cannot encode all characters. Set the LC_ALL environment variable to fix this. [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:1091]
+2025-05-02 10:02:02,075 ERROR: ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:967]
+2025-05-02 10:02:02,076 ERROR: yt-dlp DownloadError for URL https://www.youtube.com/watch?v=dQw4w9WgXcQ: ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/you.aticmatic.com/app.py:244]
+Successfully imported Flask app as application.
+2025-05-02 10:09:34,348 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:09:34,345 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:09:34,690 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:09:42,627 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:09:49,589 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:09:59,287 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:10:00,401 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:10:16,673 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+2025-05-02 10:14:51,841 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+2025-05-02 10:15:00,573 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+2025-05-02 10:22:45,941 INFO: Rendering index page. [in /home/aticmatic/you.aticmatic.com/app.py:203]
+Successfully imported Flask app as application.
+2025-05-02 10:32:00,685 INFO: Processing request for URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ [in /home/aticmatic/you.aticmatic.com/app.py:232]
+2025-05-02 10:32:00,696 INFO: Calling yt-dlp extract_info for: https://www.youtube.com/watch?v=dQw4w9WgXcQ [in /home/aticmatic/you.aticmatic.com/app.py:94]
+2025-05-02 10:32:01,240 WARNING: Assuming --restrict-filenames since file system encoding cannot encode all characters. Set the LC_ALL environment variable to fix this. [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:1091]
+2025-05-02 10:32:04,798 ERROR: ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/virtualenv/you.aticmatic.com/3.12/lib/python3.12/site-packages/yt_dlp/YoutubeDL.py:967]
+2025-05-02 10:32:04,799 ERROR: yt-dlp DownloadError for URL https://www.youtube.com/watch?v=dQw4w9WgXcQ: ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm you\u2019re not a bot. Use --cookies-from-browser or --cookies for the authentication. See  https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp  for how to manually pass cookies. Also see  https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies  for tips on effectively exporting YouTube cookies [in /home/aticmatic/you.aticmatic.com/app.py:244]
+Successfully imported Flask app as application.
+Successfully imported Flask app as application.
