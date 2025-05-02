@@ -185,6 +185,12 @@
             navigator.clipboard.writeText(text).then(() => {
                 // Could add a toast notification here
                 console.log('Copied to clipboard');
+                document.getElementById('copyURLSpan').textContent = 'Copied!';
+                
+                setTimeout(() => {
+                document.getElementById('copyURLSpan').textContent = 'Copy URL';
+                }, 2000);
+
             });
         },
         
@@ -279,7 +285,7 @@
         </header>
 
         <!-- URL Input Form -->
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8 max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8 max-w-5xl mx-auto">
             <form @submit.prevent="fetchVideoDetails(document.getElementById('media_url').value)" class="space-y-4">
                 <div>
                     <label for="media_url" class="block text-sm font-medium text-gray-700 mb-1">Media URL</label>
@@ -402,7 +408,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                                     </svg>
-                                    Copy URL
+                                    <span id="copyURLSpan">Copy URL</span>
                                 </button>
                                 <a :href="videoDetails?.url" target="_blank" rel="noopener noreferrer"
                                     class="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
@@ -606,7 +612,7 @@
         </div>
 
         <!--Instructions & Help Card-->
-        <div class="mt-8 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <div class="max-w-5xl mx-auto mt-8 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div class="flex items-start justify-between">
                 <div class="flex gap-3">
                     <div class="flex-shrink-0 text-blue-500">
@@ -661,7 +667,7 @@
         </div>
         <!-- API Information Section (New) -->
         <div
-            class="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-gray-200 p-6 text-center">
+            class="max-w-5xl mx-auto mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-gray-200 p-6 text-center">
             <h3 class="text-lg font-semibold text-gray-800 mb-2">Developer API Available</h3>
             <p class="text-sm text-gray-600 mb-4">
                 Want to integrate media downloading into your own application? We offer a simple JSON API.
