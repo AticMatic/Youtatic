@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Downloader API Documentation</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📥</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Inter', sans-serif;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-6 md:p-12 lg:p-20">
+    <div class="max-w-4xl mx-auto">
+        <header class="mb-8 text-center">
+            <div class="text-5xl">📥</div>
+            <h1 class="mt-4 text-3xl font-bold text-gray-800">Media Downloader API</h1>
+            <p class="text-gray-600 mt-2">Simple JSON API for extracting download formats from supported media URLs.</p>
+        </header>
+
+        <section class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. Obtain Your API Key</h2>
+            <p class="text-gray-700 mb-2">Send a <code>POST</code> request to <code>/register_api_user</code> with your
+                email and phone:</p>
+            <pre><code>POST /register_api_user HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+email=user@example.com&phone=+1234567890</code></pre>
+            <p class="text-gray-700 mb-2">Successful response:</p>
+            <pre><code>{
+  "success": true,
+  "email": "user@example.com",
+  "api_key": "YOUR-NEW-API-KEY"
+}</code></pre>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">2. Get Available Formats</h2>
+            <p class="text-gray-700 mb-2">Use your API key to fetch formats for a given media URL:</p>
+            <pre><code>GET /api/v1/formats?url=https://www.youtube.com/watch?v=abc123 HTTP/1.1
+X-API-Key: YOUR-API-KEY
+Accept: application/json</code></pre>
+
+            <p class="text-gray-700 mb-2">Example <code>curl</code> command:</p>
+            <pre><code>curl -G \
+  -H "X-API-Key: YOUR-API-KEY" \
+  --data-urlencode "url=https://youtu.be/abc123" \
+  https://your-domain.com/api/v1/formats</code></pre>
+
+            <p class="text-gray-700 mb-2">Successful response:</p>
+            <pre><code>{
+  "success": true,
+  "data": {
+    "title": "Video Title",
+    "original_url": "https://youtu.be/abc123",
+    "formats": [
+      {
+        "format_id": "18",
+        "ext": "mp4",
+        "resolution": "360p",
+        "filesize": 1024000,
+        "filesize_display": "1.0 MB",
+        "type": "Video+Audio",
+        "url": "https://..."
+      },
+      // ... more formats
+    ]
+  }
+}</code></pre>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Error Handling</h2>
+            <p class="text-gray-700 mb-2">Errors return <code>success: false</code> and an <code>error</code> message,
+                e.g.:</p>
+            <pre><code>{
+  "success": false,
+  "error": "Unsupported URL."
+}</code></pre>
+        </section>
+
+        <footer class="text-center text-gray-500 text-sm">
+            <p>© 2025 Media Downloader • Designed by Aticmatic</p>
+            <p>This API respects source site terms of service and fair use policies.</p>
+        </footer>
+    </div>
+</body>
+
+</html>
